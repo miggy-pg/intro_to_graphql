@@ -15,8 +15,10 @@ Contains all the knowledge required for telling GraphQL exactly what our applica
 
 #### A Simple GraphiQL Query
 
-Notice the displayed returned values has a 'user' key. This is because of our **RootQuery** where is we defined it in line 27.
+Notice the displayed returned values has a 'user' key. This is because of our **RootQuery** where we define it in line 27(under **fields**).
+
 **HOW THIS WORKS:**
+
 'user': this means look for me a user  
 'args'(arguments): is the field/parameter we need to provide in this object/instance which in any case the 'id' of the user.
 'type': means that it will return the user
