@@ -1,4 +1,4 @@
-## Working with GraphQL
+# Working with GraphQL
 
 ![](screenshots/sample-overall-architecture.png "Overall Architecture of our Sample Project")
 
@@ -9,11 +9,11 @@ We will create an **Express** server then hook to a **Datastore** and then load 
 - solely made for development purposes to help us feel how GraphQL works and how we can execute queries with it
 - made by GraphQL team
 
-#### GraphQL Schemas
+### GraphQL Schemas
 
 Contains all the knowledge required for telling GraphQL exactly what our application's data looks like, including what properties each object has and exactly how each object is related to each other.
 
-##### A Simple GraphiQL Query
+#### A Simple GraphiQL Query
 
 Notice the displayed returned values has a 'user' key. This is because of our **RootQuery** where is we defined it in line 27.
 **HOW THIS WORKS:**
@@ -68,15 +68,19 @@ const RootQuery = new GraphQLObjectType({
 
 ```
 
-#### Architect an Actual Project with GraphQL
+### Architecture of an Actual Project with GraphQL
 
-##### Simple
+#### Simple
 
 ![](screenshots/simple-graphql.png)
+
 Explanation:
 We have a browser running a GraphiQIL that sends a GraphQL query to our Express/GraphQL server and in theory we can have a MongoDB database/any db and find and collect the data out from the schema using 'resolve' function(think of it as is similar to 'yield' in Scrapy wherein it will return the data to the user)
 
+#### Big Projects
+
 ![](screenshots/big-projects-graphql.png)
+
 NOTE:
 
 - GraphQL can serve as proxies of sorts to go and fetch data from all of these different sources, pull all the data together, and ship a response back to our user.
