@@ -27,13 +27,14 @@ Notice the displayed returned values has a 'user' key. This is because of our **
 **args** :: the actual object that gets called with whatever arguments were passed into the original query.
 For example, in our **args** parameter, if we declare/assign an **id**, the **id** data will also be present when we display the data in our resolve **args**.
 
-| Parameters | Function |
-| **user** | Look for me a user |
-| **args** | The field/parameter we need to provide in this object/instance, which in any case is the **id** of the user. |
-| **type** | Will return the user |
-| **resolve** | A function where it goes to the database/datastore and finds the actual data we are looking for. |
-| **parentValue** | Somewhat notorious because it won't be used ever. |
-| **args** | The actual object that gets called with whatever arguments were passed into the original query. For example, in our **args** parameter, if we declare/assign an **id**, the **id** data will also be present when we display the data in our resolve **args**.|
+| Parameters      | Function                                                                                                                                                                                                                                                       |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **user**        | Look for me a user                                                                                                                                                                                                                                             |
+| **args**        | The field/parameter we need to provide in this object/instance, which in any case is the **id** of the user.                                                                                                                                                   |
+| **type**        | Will return the user                                                                                                                                                                                                                                           |
+| **resolve**     | A function where it goes to the database/datastore and finds the actual data we are looking for.                                                                                                                                                               |
+| **parentValue** | Somewhat notorious because it won't be used ever.                                                                                                                                                                                                              |
+| **args**        | The actual object that gets called with whatever arguments were passed into the original query. For example, in our **args** parameter, if we declare/assign an **id**, the **id** data will also be present when we display the data in our resolve **args**. |
 
 ```javascript
 // See schema.js for full code
