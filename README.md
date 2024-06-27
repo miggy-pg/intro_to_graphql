@@ -19,13 +19,13 @@ Notice the displayed returned values has a 'user' key. This is because of our **
 
 **HOW THIS WORKS:**
 
-'user': this means look for me a user  
-'args'(arguments): is the field/parameter we need to provide in this object/instance which in any case the 'id' of the user.
-'type': means that it will return the user
-'resolve': is a function where it goes to the database/datastore and find the actual data we are looking for resolve params:  
-'parentValue' = somewhat notorious because it won't be used ever
-'args' = the actual object that gets called with whatever arguments were passed into the original query.
-For example, in our 'args' parameter, if we declare/assign an 'id', the 'id' data will also be present when we display the data in our resolve 'args'
+**user** :: look for me a user  
+**args**(arguments) :: the field/parameter we need to provide in this object/instance which in any case the **id** of the user.
+**type** :: will return the user
+**resolve** :: a function where it goes to the database/datastore and find the actual data we are looking for resolve params:  
+**parentValue** :: somewhat notorious because it won't be used ever
+**args** :: the actual object that gets called with whatever arguments were passed into the original query.
+For example, in our **args** parameter, if we declare/assign an **id**, the **id** data will also be present when we display the data in our resolve **args**.
 
 ```javascript
 // See schema.js for full code
