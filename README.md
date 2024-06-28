@@ -1,5 +1,16 @@
 # Working with GraphQL
 
+### Installation
+
+1. We are using express-graphql as a middleware to build a connection between express and graphql
+2. At the beginning of this project, lodash will be used as a helper tool to query to our database and collect it. (resolve function will help us return this to our user)
+
+```shell
+npm i express express-graphql graphql lodash
+
+
+```
+
 ![](screenshots/sample-overall-architecture.png "Overall Architecture of our Sample Project")
 
 We will create an **Express** server then hook to a **Datastore** and then load up pre-built GraphiQL to test some test queries.
@@ -88,3 +99,87 @@ NOTE:
 
 - GraphQL can serve as proxies of sorts to go and fetch data from all of these different sources, pull all the data together, and ship a response back to our user.
   **We are following this approach when we created 'db.json'**, meaning, we are running a separate server process from our normal GraphQL server.
+
+### Async Resolve Functions
+
+![](screenshots/resolve_function.png)
+
+- Resolve functions can work by returning a Promise so it can work in Asynchronous
+
+### How our GraphQL query data
+
+![](screenshots/graphql_query_movement.png)
+
+1. In our current GraphQL, our query starts at the RootQuery (Update: we added new rootquery to collect data immediately to Company)
+2. So, we cannot directly collect data from the Company
+3. This is Unidirectional in anture, which we can only operate in a single direction
+
+![](screenshots/how_resolve_is_helping.png)
+![](screenshots/thinking_as_graph.png)
+
+- Imagine we are working in a graph
+- **Resolve** is a function in helping us move from one object type to another by returning a piece of data
+- Think of edges in our graph as the **resolve** function
+
+### Query Fragments
+
+- A list of different properties that we want to get access to.
+- Why use? because defining repeated text is tiresome to duplicate (For example, we added **id**, **name**, and **description** to apple and google)
+
+Since we can use multiple field from our RootQuery, we can use an **alias** that the returned values are assigned to this name. In this case, we are using **apple** and **google**.
+
+**NOTE:** We do not need to name both of them, as long as they don't have the same IDs
+
+```javascript
+// INPUT:
+{
+  apple: company(id: "1"){
+    // id
+    // name
+    // description
+    ...companyDetails
+  }
+
+  google: company(id: "2"){
+    // id
+    // name
+    // description
+    ...companyDetails
+  }
+}
+
+// paramters:
+// 'companyDetails' is the name of our fragment
+// 'Company' a type checking that our object will be collected from Company object(JUST A TYPE CHECKING, SO WE CAN REMOVE THIS BUT ESSENTIALLY IMPORTANT)
+fragment companyDetails on Company {
+  id
+  name
+  description
+}
+
+// OUTPUT
+{
+  "data": {
+    "apple": {
+      "id": "1",
+      "name": "Apple",
+      "description": "IPhone"
+    },
+    "google": {
+      "id": "2",
+      "name": "Google",
+      "description": "Search"
+    }
+  }
+}
+```
+
+## Introduction to Mutations
+
+Mutations are used to change our data in some fashion. Mutations can be used to delete records, update them, or even create new records.
+
+**We will now add mutation to our schema**
+![](screenshots/intro-to-mutations.png)
+
+- We will create a separate objects for manipulating data
+- CompanyType and UserType won't be affected

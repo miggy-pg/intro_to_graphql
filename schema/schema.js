@@ -1,31 +1,57 @@
 const graphql = require("graphql")
+const axios = require("axios")
+
+// We don't need to use lodash since we will be using 'axios'
 // Lodash helps us walk through collections of data and work through collections of data. (a helper library)
 // So it will walk through the users(line 12)
-const _ = require("lodash")
+// const _ = require("lodash")
 
 const {
   GraphQLObjectType,
   GraphQLString,
   GraphQLInt,
+  GraphQLList,
   GraphQLSchema   //takes in a root query and returns a GraphQL schema instance
 } = graphql
 
-const users = [
-  {id: '23', firstName: 'Bill', age: 20},
-  {id: '47', firstName: 'Samantha', age: 24}
-]
-
-
+// If you encounter circular references, add an arrow function in the fields.
+// This means that wait for UserType to load before running CompanyType because we are using UserType for returns the
+// list of users from a company. (Closures)
+// Example:
+// Before:      fields: { id: {type:GraphQLString}}
+// After:       fields: ()=> ({ id: {type:GraphQLString}})
+const CompanyType = new GraphQLObjectType({
+  name: 'Company',
+  fields: () => ({
+    id: {type: GraphQLString},
+    name: {type: GraphQLString},
+    description: {type: GraphQLString},
+    users: {    // teach GraphQL to return list of users from a company
+      type: new GraphQLList(UserType),
+      resolve(parentValue, args){
+        console.log("company: ", parentValue);
+        return axios.get(`http://localhost:3000/companies/${parentValue.id}/users`).then(res => res.data)
+      }
+    }
+  })
+})
 
 // We are using 'GraphQLObjectType' to instruct GraphQL about the presence of a user in our application
 // Think of it similarly to a MongoDB schema(POV)
 const UserType = new GraphQLObjectType({
   name: 'User',
-  fields: {
+  fields: ()=> ({
     id: {type: GraphQLString},
     firstName: {type: GraphQLString},
-    age: {type: GraphQLInt}
-  }
+    age: {type: GraphQLInt},
+    company: {
+      type: CompanyType,
+      resolve(parentValue, args){     // Using resolve, we can query to another object
+        console.log(parentValue);
+        return axios.get(`http://127.0.0.1:3000/companies/${parentValue.companyId}`).then(res => res.data)
+      }
+    }
+  })
 })
 
 // The field in our RootQuery will be interesting because of its purpose
@@ -49,7 +75,19 @@ const RootQuery = new GraphQLObjectType({
         id: {type: GraphQLString}
       },
       resolve(parentValue, args){
-        return _.find(users, {id:args.id})
+        return axios.get(`http://127.0.0.1:3000/users/${args.id}`).then(res=> res.data)
+        // const { data } = res
+        // return data
+      }
+    },
+    company: {
+      type: CompanyType,
+      args: {
+        id: {type: GraphQLString}
+      },
+      resolve(parentValue, args){
+        // The 'companies' data can be found in the db.json, similar to 'user'
+        return axios.get(`http://127.0.0.1:3000/companies/${args.id}`).then(res=> res.data)
       }
     }
   }
