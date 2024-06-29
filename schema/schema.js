@@ -11,6 +11,7 @@ const {
   GraphQLString,
   GraphQLInt,
   GraphQLList,
+  GraphQLNonNull,
   GraphQLSchema   //takes in a root query and returns a GraphQL schema instance
 } = graphql
 
@@ -93,7 +94,54 @@ const RootQuery = new GraphQLObjectType({
   }
 })  
 
+// The fields of the mutation describes the operation that it will gonna take
+// So in this objecttype, instead of using 'user' or 'company' in the fields, we will use 'addUser'
+// NOTE: The collection of data and the 'type' of data might not always be the same 
+// Example: in the 'addUser' where we defined type: 'UserType' will not always be 'UserType' or return nothing at all
+// GraphQLNonNull = ensures that whenever we use 'addUser', the 'firstName' and 'age' should not be null
+const mutation = new GraphQLObjectType({
+  name: "Mutation",
+  fields: {
+    addUser: {
+      type: UserType,
+      args: {
+        firstName: {type: new GraphQLNonNull(GraphQLString)},
+        age: {type: new GraphQLNonNull(GraphQLInt)},
+        companyId: {type: GraphQLString}
+      },
+      resolve(parentValue, {firstName, age}){
+        return axios.post("http://127.0.0.1:3000/users", { firstName, age }).then(res => res.data)
+      }
+    },
+    deleteUser: {
+      type: UserType,
+      args: {
+        userId: {type: new GraphQLNonNull(GraphQLString)}
+      },
+      resolve(parentValue, {userId}){
+        return axios.delete(`http://127.0.0.1:3000/users/${userId}`).then(res => res.data)
+      }
+    },
+    editUser: {
+      type: UserType,
+      args: {
+        userId: {type: new GraphQLNonNull(GraphQLString)},
+        firstName: {type: GraphQLString},
+        age: {type: GraphQLInt},
+        companyId: {type: GraphQLString}
+      },
+      resolve(parentValue, args){
+        // We can pass the whole args in this case because the third party 'json-server' ignores the 'id' property in args
+        return axios.patch(`http://127.0.0.1:3000/users/${args.userId}`, args).then(res => res.data)
+      }
+
+    }
+  }
+})
+
+
 //The GraphQLSchema takes in a root query and returns a GraphQL schema instance
 module.exports = new GraphQLSchema({
   query: RootQuery,
+  mutation
 })

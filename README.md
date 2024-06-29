@@ -183,3 +183,60 @@ Mutations are used to change our data in some fashion. Mutations can be used to 
 
 - We will create a separate objects for manipulating data
 - CompanyType and UserType won't be affected
+
+```javascript
+const mutation = new GraphQLObjectType({
+  name: "Mutation",
+  fields: {
+    addUser: {
+      type: UserType,
+      args: {
+        firstName: {type: new GraphQLNonNull(GraphQLString)},
+        age: {type: new GraphQLNonNull(GraphQLInt)},
+        companyId: {type: GraphQLString}
+      },
+      resolve(parentValue, {firstName, age}){
+        return axios.post(`http://127.0.0.1:3000/users`, { firstName, age }).then(res => res.data)
+      }
+    }
+  }
+})
+
+```
+
+- When we use mutation, it has a different declaration wherein we declare **mutation**
+- Even though this is a **post** request, we should always return some data from it. In this case, **id**, **firstName**, and **age**
+```javascript
+mutation {
+  addUser(firstName:"Jonathan", age:30){
+    id
+    firstName
+    age
+  }
+}
+```
+
+## Recalling How PUT vs PATCH Work
+![](screenshots/put-vs-patch.png)
+
+#### PUT 
+- When we want to completely replace the existing record saved on some other remote database with the details inside of our request body
+- (Look at the given example above) For example, in our request body, we defined **id** and **firstName** in an object, it will the **id** and **firstName** in our data including **age** and **companyId** setting to null because these were not defined in our request body object.
+
+### PATCH
+- Only overwrites the properties that are contained within the request body
+- (Look at the given example above) For example, in our request body (object), we defined **id** and **firstName** in an object, it will only the **id** and **firstName** in our database only.
+
+
+## GraphQL Express vs Apollo Client
+We will be using **express-graphql** which is not part of Apollo stack but there is not Apollo server that we can make use of. Neither is better than the other
+![](screenshots/graphql-vs-apollo.png)
+
+#### GraphQL Express
+- Reference implementation of GraphQL, sort of spec how our server will be implemented with GraphQL
+- Creates a big object and define the fields and resolve functions that travel to each node in our data
+
+#### Apollo Server
+- Different way on implementing GraphQL to the server
+- Break up to two separation sections: **Types** file and **Resolvers** file
+
