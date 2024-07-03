@@ -312,6 +312,7 @@ const UserType = new GraphQLObjectType({
     }
   })
 })
+
 ```
 - For the company field in UserType, the resolver function is called.
 - The parentValue here is the user object: { id: "67", firstName: "John", companyId: "123" }.
@@ -341,6 +342,4 @@ const CompanyType = new GraphQLObjectType({
 - If the query included fields for the company, those fields would now be resolved using the company object.
 - For example, if there was a users field in the CompanyType, its resolver would use the company object as parentValue.
 
-
-
-In simpler term, the properties of the **user** are the **parentValue**
+In simpler term, for the **UserType** the properties of the **user** are the **parentValue**
