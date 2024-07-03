@@ -240,3 +240,107 @@ We will be using **express-graphql** which is not part of Apollo stack but there
 - Different way on implementing GraphQL to the server
 - Break up to two separation sections: **Types** file and **Resolvers** file
 
+### Understanding parentValue in Resolvers
+**parentValue** (also known as source or root in some contexts) is the result of the previous resolver in the chain. It carries the resolved data from the parent object.
+
+**GraphQL Query**
+```javascript
+{
+  user(id:"67"){
+    id
+    firstName
+    company{
+      name
+    }
+  }
+}
+// parentValue of UserType:
+// { id: '67', firstName: 'Jade', age: 15, companyId: '2', userId: '67' }
+
+// args of RootQuery 'user':
+// { id: "67" }
+
+// parentValue of RootQuery 'user':
+// undefined
+
+```
+
+### See explanation below
+
+
+**Resolver Chain Explanation**
+```javascript
+const RootQuery = new GraphQLObjectType({
+  name: "RootQueryType",
+  fields: {
+    user: {
+      type: UserType,
+      args: {
+        id: {type: GraphQLString}
+      },
+      resolve(parentValue, args){
+        console.log("rootQueryUser: ", args);
+        return axios.get(`http://127.0.0.1:3000/users/${args.id}`).then(res=> res.data)
+        // const { data } = res
+        // return data
+      }
+    },
+})  
+
+```
+- The user field in the RootQuery is resolved first.
+- args contains the query arguments, so args.id is "67".
+- The resolver fetches the user with ID "67" from the API.
+- The response is an object representing the user, e.g., { id: "67", firstName: "John", companyId: "123" }.
+- This user object becomes the parentValue for the next level of resolvers (the fields of UserType).
+
+**UserType Resolver**
+```javascript
+// GraphQL 
+const UserType = new GraphQLObjectType({
+  name: 'User',
+  fields: ()=> ({
+    id: {type: GraphQLString},
+    firstName: {type: GraphQLString},
+    age: {type: GraphQLInt},
+    company: {
+      type: CompanyType,
+      resolve(parentValue, args){     // Using resolve, we can query to another object
+        console.log("user: ",parentValue);
+        return axios.get(`http://127.0.0.1:3000/companies/${parentValue.companyId}`).then(res => res.data)
+      }
+    }
+  })
+})
+```
+- For the company field in UserType, the resolver function is called.
+- The parentValue here is the user object: { id: "67", firstName: "John", companyId: "123" }.
+- The resolver uses parentValue.companyId (which is "123") to fetch the company details from the API.
+- The response is an object representing the company, e.g., { id: "123", name: "Google", description: "Tech Company" }.
+- This company object becomes the parentValue for the next level of resolvers (the fields of CompanyType).
+
+**ComapnyType Resolver**
+```javascript
+const CompanyType = new GraphQLObjectType({
+  name: 'Company',
+  fields: () => ({
+    id: {type: GraphQLString},
+    name: {type: GraphQLString},
+    description: {type: GraphQLString},
+    users: {    // teach GraphQL to return list of users from a company
+      type: new GraphQLList(UserType),
+      resolve(parentValue, args){
+        console.log("company: ", parentValue);
+        return axios.get(`http://localhost:3000/companies/${parentValue.id}/users`).then(res => res.data)
+      }
+    }
+  })
+})
+
+```
+- If the query included fields for the company, those fields would now be resolved using the company object.
+- For example, if there was a users field in the CompanyType, its resolver would use the company object as parentValue.
+
+
+
+In simpler term, the properties of the **user** are the **parentValue**

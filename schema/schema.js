@@ -48,7 +48,7 @@ const UserType = new GraphQLObjectType({
     company: {
       type: CompanyType,
       resolve(parentValue, args){     // Using resolve, we can query to another object
-        console.log(parentValue);
+        console.log("user: ",parentValue);
         return axios.get(`http://127.0.0.1:3000/companies/${parentValue.companyId}`).then(res => res.data)
       }
     }
@@ -76,6 +76,8 @@ const RootQuery = new GraphQLObjectType({
         id: {type: GraphQLString}
       },
       resolve(parentValue, args){
+        console.log("rootQueryUser: ", args);
+        console.log("parentValueRootQuery: ", parentValue);
         return axios.get(`http://127.0.0.1:3000/users/${args.id}`).then(res=> res.data)
         // const { data } = res
         // return data
